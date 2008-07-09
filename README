@@ -1,5 +1,5 @@
 This is Async Observer -- a Rails plugin that provides deep integration with
-Beanstalk.
+Beanstalk.  It is also a Merb plugin, based on code by Chris Van Pelt.
 
 For more information, see http://async-observer.rubyforge.org/.
 
