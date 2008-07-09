@@ -5,3 +5,11 @@ For more information, see http://async-observer.rubyforge.org/.
 
 For more information on Beanstalk, see its home page at
 http://xph.us/software/beanstalkd/.
+
+
+To load properly in merb, register the dependency in the before_app_loads
+hook.  Otherwise, it doesn't know which ORM to use.
+
+Merb::BootLoader.before_app_loads do
+  dependency 'async_observer'
+end
