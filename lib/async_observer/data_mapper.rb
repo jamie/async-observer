@@ -8,7 +8,7 @@ module DataMapper::Resource::ClassMethods
 
   def async_after(target_method, method_sym = nil, &block)
     seq = async_hook_seq
-    @async_hooks = []
+    @async_hooks ||= []
     @async_hooks[seq] = block
     ahook = :"_async_after_#{target_method}_#{seq}"
 
