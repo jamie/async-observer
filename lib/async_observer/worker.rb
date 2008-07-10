@@ -90,7 +90,7 @@ class AsyncObserver::Worker
   def mark_db_socket_close_on_exec()
     ActiveRecord::Base.active_connections.each{|conn|conn.set_close_on_exec}
   rescue NoMethodError # set_close_on_exit isn't set up
-  rescue NameError # activerecord not loaded
+  rescue NameError # activerecord not loaded # TODO: handle DataMapper if necessary
   end
 
   def shutdown()
@@ -230,11 +230,15 @@ class AsyncObserver::Worker
 end
 
 if defined?(ActiveRecord)
-class ActiveRecord::ConnectionAdapters::MysqlAdapter
-  def set_close_on_exec()
-    @connection.set_close_on_exec()
+  class ActiveRecord::ConnectionAdapters::MysqlAdapter
+    def set_close_on_exec()
+      @connection.set_close_on_exec()
+    end
   end
 end
+if defined?(DataMapper)
+  # TODO: Find out if Datamapper has similar performance considerations
+  # to do with the leaking of file descriptors with extended use.
 end
 
 class Mysql
