@@ -160,7 +160,7 @@ class String
 end
 
 class Array
-  def rrepr() '[' + map(&:rrepr).join(', ') + ']' end
+  def rrepr() '[' + map{|e|e.rrepr}.join(', ') + ']' end
 end
 
 class Hash
@@ -173,7 +173,18 @@ end
 
 module AsyncObserver::Extensions
   def rrepr()
-    method = (respond_to? :get_cache) ? 'get_cache' : 'find'
+    method = if respond_to? :get_cache
+      # not quite sure what this one is about -- Jamie
+      'get_cache'
+    elsif self.class.respond_to? :find
+      # ActiveRecord
+      'find'
+    elsif self.class.respond_to? :get
+      # DataMapper
+      'get'
+    else
+      raise ArgumentError.new('no consistent external repr for ' + self.inspect)
+    end
     "#{self.class.rrepr}.#{method}(#{id.rrepr})"
   end
 end

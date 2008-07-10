@@ -46,7 +46,9 @@ end
 if defined?(ActiveRecord)
   require 'async_observer/active_record'
 end
-
+if defined?(DataMapper)
+  require 'async_observer/data_mapper'
+end
 
 class Range
   DEFAULT_FANOUT_FUZZ = 0
