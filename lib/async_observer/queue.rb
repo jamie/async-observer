@@ -50,7 +50,13 @@ class << AsyncObserver::Queue
     return sync_run(obj) if (:direct.equal?(pri) or !queue)
     queue.connect()
     queue.use(tube)
-    info = [queue.yput(obj, pri, delay, ttr), queue.last_server]
+    begin
+      info = [queue.yput(obj, pri, delay, ttr), queue.last_server]
+    rescue Beanstalk::NotConnected
+      # We managed to lose the connection, make
+      # sure the job still gets run anyway.
+      return sync_run(obj)
+    end
     f = AsyncObserver::Queue.after_put
     f.call(*info) if f
     return info
