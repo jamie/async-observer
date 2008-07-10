@@ -11,14 +11,9 @@ module DataMapper::Resource::ClassMethods
   end
 
   def async_after(target_method, method_sym = nil, &block)
-    seq = async_hook_seq
-    @async_hooks ||= []
-    @async_hooks[seq] = block
-    ahook = :"_async_after_#{target_method}_#{seq}"
+    ahook = :"_async_after_#{target_method}_#{async_hook_seq()}"
 
-    define_method ahook do
-      @async_hooks[seq].call()
-    end
+    define_method ahook, &block
 
     after target_method do
       async_send(ahook)
