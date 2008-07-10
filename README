@@ -7,9 +7,36 @@ For more information on Beanstalk, see its home page at
 http://xph.us/software/beanstalkd/.
 
 
-To load properly in merb, register the dependency in the before_app_loads
-hook.  Otherwise, it doesn't know which ORM to use.
+Configuration
+=============
 
-Merb::BootLoader.before_app_loads do
-  dependency 'async_observer'
-end
+Rails
+-----
+In your enviroment file (either config/environment.rb, or the environment-
+specific config files), add the following lines:
+
+  AsyncObserver::Queue.queue = Beanstalk::Pool.new(%w(localhost:11300))
+  AsyncObserver::Queue.app_version = '1.0'
+
+app_version should ideally be something that changes each time you update
+your code.  Beanstalk::Pool.new should of course attempt to connect to
+wherever your beanstalkd server is listening.
+
+Merb
+----
+In init.rb, register the dependency in a before_app_loads block, like so:
+
+  Merb::BootLoader.before_app_loads do
+    dependency 'async_observer'
+  end
+
+This will occur after you have selected your ORM, which will then be auto-
+detected.  Note that only ActiveRecord and DataMapper are currently supported.
+
+Then, as above for Rails, connect to your Beanstalk server in the
+after_app_loads block:
+
+  Merb::Bootloader.after_app_loads do
+    AsyncObserver::Queue.queue = Beanstalk::Pool.new(%w(localhost:11300))
+    AsyncObserver::Queue.app_version = '1.0'
+  end
