@@ -78,7 +78,7 @@ class << AsyncObserver::Queue
 
   def pkg(code)
     {
-      :type => :rails,
+      :type => :async_observer,
       :code => code,
     }
   end

@@ -211,7 +211,7 @@ class AsyncObserver::Worker
   end
 
   def async_observer_job?(job)
-    begin job.ybody[:type] == :rails rescue false end
+    begin job.ybody[:type] == :async_observer rescue false end
   end
 
   def run_other(job)
