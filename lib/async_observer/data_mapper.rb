@@ -1,3 +1,7 @@
+module AsyncObserver
+  NotFound = DataMapper::ObjectNotFoundError
+end
+
 DataMapper::Resource.send :include, AsyncObserver::Extensions
 
 module DataMapper::Resource::ClassMethods

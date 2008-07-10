@@ -1,3 +1,7 @@
+module AsyncObserver
+  NotFound = ActiveRecord::RecordNotFound
+end
+
 ActiveRecord::Base.send :include, AsyncObserver::Extensions
 
 HOOKS = [:after_create, :after_update, :after_save]

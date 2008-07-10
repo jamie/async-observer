@@ -88,8 +88,9 @@ class AsyncObserver::Worker
 
   # This prevents us from leaking fds when we exec. Only works for mysql.
   def mark_db_socket_close_on_exec()
-    ActiveRecord::Base.active_connections.each(&:set_close_on_exec)
-  rescue NoMethodError
+    ActiveRecord::Base.active_connections.each{|conn|conn.set_close_on_exec}
+  rescue NoMethodError # set_close_on_exit isn't set up
+  rescue NameError # activerecord not loaded
   end
 
   def shutdown()
@@ -153,7 +154,9 @@ class AsyncObserver::Worker
   end
 
   def dispatch(job)
-    ActiveRecord::Base.verify_active_connections!
+    if defined?(ActiveRecord)
+      ActiveRecord::Base.verify_active_connections!
+    end
     return run_ao_job(job) if async_observer_job?(job)
     return run_other(job)
   end
@@ -198,7 +201,7 @@ class AsyncObserver::Worker
     f.call(job) if f
     run_code(job)
     job.delete()
-  rescue ActiveRecord::RecordNotFound => ex
+  rescue AsyncObserver::NotFound => ex
     if job.age > 60
       job.delete() # it's old; this error is most likely permanent
     else
@@ -226,10 +229,12 @@ class AsyncObserver::Worker
   end
 end
 
+if defined?(ActiveRecord)
 class ActiveRecord::ConnectionAdapters::MysqlAdapter
   def set_close_on_exec()
     @connection.set_close_on_exec()
   end
+end
 end
 
 class Mysql
