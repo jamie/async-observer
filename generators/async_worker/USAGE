@@ -1,0 +1,10 @@
+Description:
+    Generates a script to execute delayed tasks from Beanstalk. Part of 
+    the async-observer plugin. You should only need one worker to process
+    the current tube.
+
+Examples:
+    merb-gen async_worker myrunner
+    will create a runner script:
+    /lib/myrunner.rb
+    Run with: merb -a runner -r lib/myrunner.rb
