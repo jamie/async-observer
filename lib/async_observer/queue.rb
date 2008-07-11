@@ -17,6 +17,7 @@
 
 
 require 'beanstalk-client'
+require 'async_observer/worker'
 
 module AsyncObserver; end
 
