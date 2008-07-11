@@ -20,21 +20,18 @@ module DataMapper::Resource::ClassMethods
     end
   end
 
-  # untested
   def send_to_instance(id, selector, *args)
     x = get(id)
     x.send(selector, *args) if x
   end
 
-  # untested
   def async_each_opts(selector, opts, *args)
-    min = opts.fetch(:min, minimum(:id))
-    max = opts.fetch(:max, maximum(:id))
+    min = opts.fetch(:min, min(:id))
+    max = opts.fetch(:max, max(:id))
 
     (min..max).async_each_opts(self, :send_to_instance, opts, selector, *args)
   end
 
-  # untested
   def async_each(selector, *args)
     async_each_opts(selector, {}, *args)
   end

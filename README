@@ -40,3 +40,6 @@ after_app_loads block:
     AsyncObserver::Queue.queue = Beanstalk::Pool.new(%w(localhost:11300))
     AsyncObserver::Queue.app_version = '1.0'
   end
+
+If you intend to use async_each with DataMapper, you will need to add a
+dependency on the dm-aggregates library, from dm-more.
