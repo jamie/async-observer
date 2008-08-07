@@ -84,6 +84,7 @@ class AsyncObserver::Worker
       end
       AsyncObserver::Queue.queue.watch(appver) if appver
     end
+    flush_logger
   end
 
   # This prevents us from leaking fds when we exec. Only works for mysql.
@@ -176,7 +177,16 @@ class AsyncObserver::Worker
         raise ex
       rescue Exception => ex
         handle_error(job, ex)
+      ensure
+        flush_logger
       end
+    end
+  end
+
+  def flush_logger
+    if defined?(RAILS_DEFAULT_LOGGER) &&
+        RAILS_DEFAULT_LOGGER.respond_to?(:flush)
+      RAILS_DEFAULT_LOGGER.flush
     end
   end
 
@@ -199,6 +209,7 @@ class AsyncObserver::Worker
     RAILS_DEFAULT_LOGGER.info 'running as async observer job'
     f = self.class.before_filter
     f.call(job) if f
+    job.delete if job.ybody[:delete_first]
     run_code(job)
     job.delete()
   rescue AsyncObserver::NotFound => ex
